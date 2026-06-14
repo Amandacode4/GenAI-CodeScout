@@ -37,9 +37,7 @@ class ChatAgent:
         print("--- History Reset ---")
 
     def compact_history(self):
-        """
-        Summarise the chat history into a single system message to conserve tokens.
-        """
+        # compress old chat into summary
         if len(self.messages) <= 3:
             print("--- History too short to compact ---")
             return
@@ -55,7 +53,7 @@ class ChatAgent:
             )
             summary = response.choices[0].message.content
             
-            # Replace history with a new system prompt containing the summary
+            # keep only summary
             self.messages = [
                 {"role": "system", "content": f"You are a helpful and intelligent assistant.\nHere is a summary of the conversation so far:\n{summary}"}
             ]
@@ -71,9 +69,7 @@ class ChatAgent:
             self.compact_history()
 
     def call_model(self, stream=True):
-        """
-        Make a chat completion call and optionally stream the response.
-        """
+        # call model and stream reply
         try:
             response = client.chat.completions.create(
                 model=self.model,
