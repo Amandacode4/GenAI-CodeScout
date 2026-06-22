@@ -1,18 +1,18 @@
-# rules for the research desk
+# Research Desk Rules
 
-## citations
-- always drop the link to the source when u quote stuff: [like this](url)
-- try to use real docs or actual papers instead of random blogs if possible
+## Citations
+- Always include source URLs inline when quoting information: [title](url)
+- Prefer primary sources and official documentation over blog posts where possible.
 
-## taking notes
-- if u find something long and important, dump it into the notes/ folder as a markdown file
-- keep the filenames simple, lowercase with hyphens (e.g. notes/transformer-stuff.md)
-- dont overwrite my existing notes unless i specifically tell u to! use the edit_file tool to just update them instead
+## Notes
+- Save significant findings to the `notes/` folder as markdown files.
+- Keep filenames simple, using lowercase letters and hyphens (e.g. `notes/transformer-attention.md`).
+- Do not overwrite existing notes unless specifically requested. Use the `edit_file` tool to update them instead.
 
-## searching and tools
-- if im asking about ML, academic stuff, or papers, use `paper_search` and `read_paper`
-- if it's just regular web stuff or current events, use `web_search` and `web_fetch`
-- actually search for the URL before u try to fetch it, dont just guess links
-- truncate the pages u fetch and just quote the relevant parts
-- to save a new note: use `write_file("notes/...")`
-- to check what we already researched: run `list_files("notes/")` and then read them
+## Search and Tool Routing
+- Use `paper_search` and `read_paper` for ML, academic research, and literature questions.
+- Use `web_search` and `web_fetch` for current events, blogs, and general web searches.
+- Search for URLs before attempting to fetch them; do not guess links.
+- Truncate fetched pages and quote only the relevant sections.
+- To save a new note: `write_file("notes/...")`
+- To review previous research: `list_files("notes/")` followed by `read_file`.

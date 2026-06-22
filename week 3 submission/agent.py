@@ -270,16 +270,16 @@ class REPLAgent(Agent):
                         self._load_session()
                         print(f"\\033[32mSwitched to session {self.session_id}\\033[0m")
                     else:
-                        print("usage: /resume <session_id>")
+                        print("Usage: /resume <session_id>")
                     continue
 
                 await self.chat(user_input)
-                print() # just a newline to make it look clean
+                print()
             except (KeyboardInterrupt, EOFError):
                 break
 
     async def run_once(self, query: str):
-        print(f"\\033[1;32mResearch Desk - Quick Query (Session {self.session_id})\\033[0m")
+        print(f"\\033[1;32mResearch Desk - Single Query (Session {self.session_id})\\033[0m")
         await self.chat(query)
         print("\\n")
 
@@ -296,7 +296,6 @@ def main():
             agent = REPLAgent()
             asyncio.run(agent.run_once(query))
     else:
-        # normal repl mode
         agent = REPLAgent()
         asyncio.run(agent.run())
 
