@@ -1,26 +1,18 @@
 # Research Desk Rules
 
 ## Citations
-- Include source URLs inline: [title](url)
-- For papers: cite as [title](https://arxiv.org/abs/{arxiv_id})
-- Prefer primary sources (papers, official docs) over blog posts
+- Always include source URLs inline: [title](url)
+- Prefer primary sources and official docs over blog posts
 
-## Papers (required tools)
-- Use `paper_search` for ML research and literature questions
-- Use `read_paper` with the arxiv_id from search results — do not guess IDs
-- If `read_paper` returns 404, fall back to `web_fetch` on arxiv.org/abs/...
-- Do not use web_search when paper_search is the right tool
+## Notes
+- Save long findings to notes/ as markdown files
+- Filename: lowercase, hyphens, topic-based (e.g. notes/transformer-attention.md)
+- Do not overwrite existing notes unless requested; use edit_file to update existing notes
 
-## Research notes
-- Save new content with `write_file` to `notes/`
-- Update existing notes with `read_file` then `edit_file` — do not rewrite whole files unnecessarily
-- Use `edit_file` operations: `append` for new sections, `replace` to revise, `delete` to remove stale parts
-- Keep edits inside `notes/` unless the user explicitly asks otherwise
-- Use lowercase hyphenated filenames: `notes/topic-name.md`
-
-## Web search
-- Use `web_search` before `web_fetch` for non-paper questions
-- Do not fetch more than 3 pages per question unless the user asks for depth
-
-## Tone
-- Be concise in chat; put detail in the note files
+## Search and Tool Routing
+- Use `paper_search` + `read_paper` for ML/academic/literature questions
+- Use `web_search` + `web_fetch` for current events, blogs, and general web docs
+- Search before fetching — don't fetch URLs blindly
+- Truncate fetched pages; quote only what's relevant
+- To save new notes, use `write_file("notes/...")`
+- To recall past work, use `list_files("notes/")` then `read_file`
