@@ -1,4 +1,4 @@
-# Code Scout: Autonomous AI Coding Agent 🚀
+# GenAI Code Scout: Autonomous AI Coding Agent 🚀
 
 Welcome to my 5-week engineering journey building **Code Scout**, a fully autonomous AI coding assistant built entirely from scratch during the CAIC Summer of Technology 2026. 
 
