@@ -3,13 +3,14 @@ from textual.binding import Binding
 from textual.widgets import Header, Footer, Input, RichLog, Static
 from textual.containers import Vertical, Horizontal
 from textual import work
+import time
 
-from agent import ResearchAgent
+from agent import Agent
 
-class ChatApp(App):
+class TUIAgent(App, Agent):
     """A full-screen terminal research agent TUI."""
     
-    TITLE = "Perplexity Clone - Week 2 Project"
+    TITLE = "Research Desk"
     CSS = """
     Screen {
         layout: vertical;
@@ -50,13 +51,27 @@ class ChatApp(App):
 
     BINDINGS = [
         Binding("ctrl+l", "clear_display", "Clear display"),
-        Binding("ctrl+k", "clear_history", "Clear history"),
         Binding("ctrl+q", "quit", "Quit"),
     ]
 
-    def __init__(self):
-        super().__init__()
-        self.agent = ResearchAgent()
+    def __init__(self, session_id=None):
+        App.__init__(self)
+        Agent.__init__(self, session_id)
+        self.stream_text = ""
+        self.ui_ready = False
+
+    def _emit(self, event_type: str, data: str):
+        if not self.ui_ready: return
+        try:
+            if event_type == "status":
+                self.call_from_thread(self.query_one("#tool_panel", RichLog).write, f"[dim]{data}[/dim]")
+            elif event_type == "tool_start":
+                self.call_from_thread(self.query_one("#tool_panel", RichLog).write, f"\\n[bold cyan]Calling tool:[/bold cyan] {data}")
+            elif event_type == "stream":
+                self.stream_text += data
+                self.call_from_thread(self.query_one("#stream_display", Static).update, self.stream_text)
+        except:
+            pass
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
@@ -68,52 +83,46 @@ class ChatApp(App):
         yield Footer()
 
     def on_mount(self) -> None:
+        self.ui_ready = True
         chat_log = self.query_one("#chat_panel", RichLog)
-        chat_log.write("[bold green]Research Agent Started.[/bold green] Ctrl+Q to quit.\n")
+        chat_log.write(f"[bold green]Research Desk Started.[/bold green] Session ID: {self.session_id}. Ctrl+Q to quit.\\n")
         
         tool_log = self.query_one("#tool_panel", RichLog)
-        tool_log.write("[bold yellow]Tool Activity Log[/bold yellow]\n")
+        tool_log.write("[bold yellow]Tool Activity Log[/bold yellow]\\n")
         
+        # Dump previous messages if resuming
+        if len(self.messages) > 1: # >1 because [0] is system prompt
+            chat_log.write(f"[dim]Resumed session with {len(self.messages)} turns...[/dim]\\n")
+            
         self.query_one(Input).focus()
 
     @work
     async def fetch_response(self, user_text: str) -> None:
         chat_log = self.query_one("#chat_panel", RichLog)
-        tool_log = self.query_one("#tool_panel", RichLog)
         stream_display = self.query_one("#stream_display", Static)
         input_box = self.query_one(Input)
         
         # Disable input while waiting
-        input_box.disabled = True
+        self.call_from_thread(setattr, input_box, "disabled", True)
         
-        # Initialize streaming display
-        stream_display.update("")
-        stream_display.set_styles("display: block;")
+        self.stream_text = ""
+        self.call_from_thread(stream_display.update, "")
+        self.call_from_thread(stream_display.set_styles, "display: block;")
         
-        current_stream_text = ""
-        
-        def status_update(msg: str):
-            tool_log.write(f"[dim]{msg}[/dim]")
-            
-        def stream_update(chunk_text: str):
-            nonlocal current_stream_text
-            current_stream_text += chunk_text
-            stream_display.update(current_stream_text)
-            
-        import time
         start_time = time.time()
             
         try:
-            answer = await self.agent.get_response(user_text, status_update, stream_update)
+            # chat() is inherited from Agent
+            answer = await self.chat(user_text)
             elapsed = time.time() - start_time
-            stream_display.set_styles("display: none;")
-            chat_log.write(f"[bold magenta][Agent][/bold magenta] [italic dim](generated in {elapsed:.1f}s)[/italic dim]\n{answer}\n")
+            self.call_from_thread(stream_display.set_styles, "display: none;")
+            self.call_from_thread(chat_log.write, f"[bold magenta][Agent][/bold magenta] [italic dim](generated in {elapsed:.1f}s)[/italic dim]\\n{answer}\\n")
         except Exception as e:
-            stream_display.set_styles("display: none;")
-            chat_log.write(f"[bold red]Error: {e}[/bold red]\n")
+            self.call_from_thread(stream_display.set_styles, "display: none;")
+            self.call_from_thread(chat_log.write, f"[bold red]Error: {e}[/bold red]\\n")
         finally:
-            input_box.disabled = False
-            input_box.focus()
+            self.call_from_thread(setattr, input_box, "disabled", False)
+            self.call_from_thread(input_box.focus)
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         user_text = event.value.strip()
@@ -122,23 +131,15 @@ class ChatApp(App):
 
         event.input.clear()
         chat_log = self.query_one("#chat_panel", RichLog)
-        chat_log.write(f"[bold cyan][You][/bold cyan]\n{user_text}\n")
+        chat_log.write(f"[bold cyan][You][/bold cyan]\\n{user_text}\\n")
         
-        # Dispatch the async worker
         self.fetch_response(user_text)
 
     def action_clear_display(self) -> None:
         """Clear the visible chat log."""
         self.query_one("#chat_panel", RichLog).clear()
-        self.query_one("#chat_panel", RichLog).write("[bold green]Display cleared.[/bold green]\n")
-
-    def action_clear_history(self) -> None:
-        """Clear history and display."""
-        self.agent = ResearchAgent()
-        self.query_one("#chat_panel", RichLog).clear()
-        self.query_one("#tool_panel", RichLog).clear()
-        self.query_one("#chat_panel", RichLog).write("[bold green]History reset.[/bold green]\n")
+        self.query_one("#chat_panel", RichLog).write("[bold green]Display cleared.[/bold green]\\n")
 
 if __name__ == "__main__":
-    app = ChatApp()
+    app = TUIAgent()
     app.run()

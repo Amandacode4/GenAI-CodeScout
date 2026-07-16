@@ -1,0 +1,1 @@
+At Google I/O 2024, the company announced improvements across Search, Workspace, Photos, Android, and more.  For a complete list of everything announced at I/O 2024, you can visit the Google Blog announcement page: https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2024-collection/

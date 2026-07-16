@@ -1,0 +1,9 @@
+openai
+python-dotenv
+requests
+markdownify
+trafilatura
+textual
+mcp
+nanoid
+pyyaml

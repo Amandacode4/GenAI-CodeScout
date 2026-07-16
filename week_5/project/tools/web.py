@@ -53,21 +53,7 @@ def web_fetch(url: str) -> str:
     except Exception as e:
         return f"Error fetching url: {e}"
 
-def save_research_note(filename: str, content: str) -> str:
-    """
-    Save findings to a markdown file in a notes/ directory.
-    """
-    try:
-        os.makedirs("notes", exist_ok=True)
-        filepath = os.path.join("notes", filename)
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write(content)
-        return f"Successfully saved note to {filepath}"
-    except Exception as e:
-        return f"Error saving note: {e}"
-
-# Tool schemas for OpenAI
-LOCAL_TOOLS = [
+WEB_TOOLS = [
     {
         "type": "function",
         "function": {
@@ -93,21 +79,6 @@ LOCAL_TOOLS = [
                     "url": {"type": "string", "description": "The full URL of the page to read."}
                 },
                 "required": ["url"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "save_research_note",
-            "description": "Save research findings to a markdown file for future reference.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "filename": {"type": "string", "description": "The name of the file to save (e.g., summary.md)."},
-                    "content": {"type": "string", "description": "The markdown content to save."}
-                },
-                "required": ["filename", "content"]
             }
         }
     }
