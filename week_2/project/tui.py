@@ -95,15 +95,19 @@ class ChatApp(App):
         def status_update(msg: str):
             tool_log.write(f"[dim]{msg}[/dim]")
             
-        def stream_update(chunk: str):
+        def stream_update(chunk_text: str):
             nonlocal current_stream_text
-            current_stream_text += chunk
+            current_stream_text += chunk_text
             stream_display.update(current_stream_text)
+            
+        import time
+        start_time = time.time()
             
         try:
             answer = await self.agent.get_response(user_text, status_update, stream_update)
+            elapsed = time.time() - start_time
             stream_display.set_styles("display: none;")
-            chat_log.write(f"[bold magenta][Agent][/bold magenta]\n{answer}\n")
+            chat_log.write(f"[bold magenta][Agent][/bold magenta] [italic dim](generated in {elapsed:.1f}s)[/italic dim]\n{answer}\n")
         except Exception as e:
             stream_display.set_styles("display: none;")
             chat_log.write(f"[bold red]Error: {e}[/bold red]\n")

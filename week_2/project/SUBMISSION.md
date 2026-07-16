@@ -17,3 +17,5 @@ I was able to push the week 2 limits and implement **all** of the bonus challeng
 2. **Streaming:** Used `AsyncOpenAI` with `stream=True` to provide a real-time Perplexity-like typing effect.
 3. **Save Research Note Tool:** Added `save_research_note` to dynamically create a `notes/` directory and save markdown findings across sessions.
 4. **Error Recovery:** Agent loop elegantly catches timeouts and MCP errors and relays them safely back to the LLM.
+5. **Multi-API Fallback:** Built an automatic failover system that loops through 6 Gemini keys and an OpenRouter endpoint to instantly recover from 429 Rate Limit errors mid-thought.
+6. **Parallel Execution:** Implemented `asyncio.gather` and `asyncio.to_thread` to execute multiple tool calls (e.g. 3 web fetches) concurrently without blocking the Textual UI main thread.

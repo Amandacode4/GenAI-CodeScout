@@ -1,111 +1,81 @@
-# CSOT GenAI/Agentic Track 2026
+# Code Scout: Autonomous AI Coding Agent 🚀
 
-## Introduction
+Welcome to my 5-week engineering journey building **Code Scout**, a fully autonomous AI coding assistant built entirely from scratch during the CAIC Summer of Technology 2026. 
 
-Welcome to the **GenAI/Agentic** track of CAIC Summer of Technology 2026.
-
-Five weeks. One project, built entirely from scratch.
-
-This track takes you from your first LLM API call to shipping a real, working AI agent — the kind that doesn't just generate text, but *takes action*. You'll implement every layer by hand: tool dispatchers, agent loops, memory systems, execution environments. No frameworks doing the heavy lifting (Langchain is overrated anyway). Just you and the primitives.
+This repository documents the step-by-step evolution of Code Scout from a simple API script into a powerful, extensible platform capable of reading codebases, executing terminal commands, fixing bugs autonomously, and learning new skills dynamically.
 
 ---
 
-## Why the Agents Track?
-
-AI powered engineering is moving fast — from prompt design to orchestration to smarter checks to make it harder for developers to shoot themselves in the foot. Here's what this track gives you:
-
-* **Manual Orchestration Mastery**: Understand the exact mechanics of tool calling, function schemas, and multi-turn loops by coding them yourself — without high-level abstractions hiding the details.
-
-* **State Management Architecture**: Move beyond stateless APIs by designing context buffers, working memory, and evolving long-term memory stores that persist across sessions.
-
-* **Real-World Execution Capabilities**: Bridge the gap between text generation and environment interaction — your agent won't just *describe* what to do, it'll *do it*.
-
-* **Leaderboard-Driven Validation**: Each week ships to an auto-graded eval set. You know exactly where you stand.
+## 🌟 What is Code Scout?
+Code Scout is a terminal-based, autonomous coding agent. Instead of just generating text, Code Scout *takes action*. It features:
+- **Interactive REPL & TUI**: Chat with the agent in a standard terminal or a full-screen Textual interface.
+- **Autonomous Execution Loop**: Capable of multi-step reasoning, tool dispatching, and verifying its own work.
+- **Sandboxed Execution**: Executes safe commands immediately but pauses destructive/modifying commands for user approval.
+- **Progressive Disclosure Skills**: Learns complex procedures by loading Markdown-based `SKILL.md` files dynamically.
+- **Model Context Protocol (MCP)**: Connects to external MCP servers (like GitHub) to dynamically expand its toolset.
 
 ---
 
-## What Are We Building?
+## 🏗️ The 5-Week Evolution (Directory Structure)
 
-![](https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzR2YjB2emk1Mm8zYTJ1dTBqM3RtZjkycHo2dXY3NGlta3dmb2pvaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/g0JP0HG6zF0o8/giphy.gif)
+This repository is organized by week, demonstrating the architectural evolution of the agent. You can explore each folder to see how the complexity scaled.
 
-The project reveals itself as the weeks progress. Each week you add a new capability layer, and by Week 5 those layers compose into an agent you could actually hand to someone.
+### [Week 1: The Foundation](week_1/)
+We started with the absolute basics. I implemented secure API-key hygiene using `.env`, mastered LLM API mechanics, and built a manual conversation state manager to hold coherent multi-turn conversations without any external frameworks.
 
----
+### [Week 2: Tools & Terminal UI](week_2/)
+I built a custom tool-calling schema from scratch before transitioning to native function calling. The agent gained the ability to fetch web pages, search the web, and connect to its first basic MCP server to read academic papers. Everything was wrapped in a beautiful full-screen Terminal UI (TUI).
 
-## Weekly Roadmap
+### [Week 3: Memory & Filesystem](week_3/)
+An agent needs persistence. I added the ability to save/resume sessions to disk and implemented persistent instructions via `AGENTS.md`. More importantly, the agent gained hands: it can now read files, write code, and edit existing files using a precise line-replacement tool.
 
-### Week 1: LLM APIs, API-Key Safety & Conversation State
+### [Week 4: Code Scout - The Coding Agent](week_4/)
+This is where it became a real coding assistant. I implemented `run_command` with a safety sandbox, allowing the agent to run tests and analyze crashes. I built a persistent `TODO` system to force the agent to verify its changes before stopping. It also gained codebase exploration tools (grep, definitions) and the ability to spin up read-only subagents for research without polluting its main context window.
 
-Foundation week — get the fundamentals right so everything built on top of them is solid.
-
-Focus on:
-
-* Understanding LLM API mechanics: requests, responses, tokens, and how to read a response object properly.
-* Understanding chat templates: How the conversation is represented as system, assistant and user dialogues.
-* Strict API-key hygiene using `.env` files, `python-dotenv`, and `.gitignore` — keys that leak cost you more than just money.
-* Managing the stateless nature of LLM APIs by building manual, role-assigned conversation history from scratch.
-
-✅ *Deliverable*: A terminal chatbot that holds a coherent multi-turn conversation, with the API key loaded from the environment and never touching the source code.
-
----
-
-### Week 2: Tools, Agents, and TUIs
-
-The heart of the course. A tool is a contract between your code and the model. An agent is a loop around tool calls. Once you see it, you can't unsee it.
-
-Focus on:
-
-* Implementing tool calling from scratch using a custom text format — so the SDK abstraction is never magic.
-* Using the OpenAI SDK's native function calling: tool schemas, the `tool_calls` response field, and the full round-trip.
-* Building web tools: fetching and cleaning pages with `requests`, searching the web with Serper, and understanding `llms.txt`.
-* Connecting an online MCP server (AlphaXiv) to an OpenAI SDK agent loop, so the agent can search and read academic papers.
-* Wrapping everything in a full-screen terminal UI with Textual.
-
-✅ *Deliverable*: **Build your own Perplexity** — a TUI research agent that chains web search, page fetching, and academic paper search (via AlphaXiv MCP) to answer research questions it couldn't answer alone.
+### [Week 5: The Extensible Platform](week_5/)
+The final capstone. Code Scout transformed from a hardcoded script into an extensible platform:
+- **Skills System**: By dropping a `SKILL.md` into the `skills/` directory, the agent can learn any new procedure.
+- **Configuration as Code**: Hardcoded API endpoints were replaced with a dynamic `config.json`.
+- **Dynamic MCP Integration**: Using Streamable HTTP, the agent can connect to external servers (like GitHub) on the fly, seamlessly merging their tools into its own capabilities.
 
 ---
 
-### Week 3: Memory, Sessions & the Filesystem
+## 🚀 Running the Final Version (Week 5)
 
-An agent that forgets everything the moment you close it isn't much of an agent. This week it gains persistence and hands.
+Want to try out the final, fully-featured version of Code Scout?
 
-Focus on:
+### 1. Setup
+```bash
+# Navigate to the final project directory
+cd week_5/project
 
-* Building persistent, resumable sessions that survive restarts by saving conversation state to disk.
-* Loading an `AGENTS.md` file into the system prompt so the agent carries standing instructions and preferences across every run.
-* Adding academic-paper tools backed by the Hugging Face Papers API.
-* Implementing a proper file toolset — `read_file` (with line numbers and paging), `edit_file`, `write_file`, `list_files` — modeled on how real coding agents read and modify code.
-* Refactoring into a clean `Agent` class hierarchy so the REPL and TUI share one brain.
+# Create a virtual environment and install dependencies
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
-✅ *Deliverable*: An agent that remembers past sessions, follows project-level instructions from `AGENTS.md`, and can read and edit files on disk.
+### 2. Configuration
+Copy the `.env.example` file to `.env` and add your API keys:
+```bash
+cp .env.example .env
+```
+*(You will need at least one Gemini, Groq, or OpenRouter API key).*
+
+### 3. Run the Agent
+Start the interactive REPL:
+```bash
+python agent.py
+```
+Or start the full-screen TUI:
+```bash
+python agent.py --tui
+```
+
+### 4. Try the Features!
+- Type `/skills list` to see what the agent can do automatically (try asking it to "commit my changes").
+- Type `/mcp list` to view available external servers.
+- Ask it to fix a bug in your code, and watch it explore, edit, and verify!
 
 ---
-
-### Week 4: Code Scout — A Real Coding Agent
-
-The capstone build-up. This week the agent stops describing changes and starts making them — running commands, editing code, and proving its own work.
-
-Focus on:
-
-* Command execution with a safety gate: a sandboxed, timed-out `run_command` that runs read-only commands immediately but pauses destructive ones for your approval.
-* A todo loop that keeps the agent working toward a goal until the change is actually verified, not just attempted.
-* Repository search — grep and definition-listing tools — so the agent can find its way around an unfamiliar codebase.
-* An edit-and-verify cycle: make a change, run the tests, read the failure, iterate.
-* Memory and subagents: an `AGENTS.md` standard plus a read-only "Explore" subagent that gathers context without crowding the main loop.
-* Tool design as a discipline — descriptions are prompts, not documentation.
-
-✅ *Deliverable*: **Code Scout** — a coding agent you can hand a real bug in an unfamiliar repo and leave alone to fix it and prove the fix works.
-
----
-
-### Week 5: The Final Stretch — Make It Yours
-
-No new agent this week. You take Code Scout and turn it from a fixed toolset into a platform anyone can extend without touching its code.
-
-Focus on:
-
-* **Skills**: storage, loading, and execution — teach the agent new *procedures* by dropping a `SKILL.md` in a folder, using the progressive-disclosure pattern the real harnesses (Claude Code, the open Agent Skills standard) converged on.
-* **MCP with authentication**: connect to *any* external MCP server declared in a `config.json`, handling API-key auth via HTTP headers, with a working GitHub example.
-* **Configuration as code**: the principle underneath both — declare your agent's capabilities as data, keep secrets in the environment.
-
-✅ *Deliverable*: **Your agent.** The Code Scout brain plus whatever skills and external tools make it genuinely useful to *you* — documented in a `SUBMISSION.md` well enough that someone else could recreate it.
+*Built with ❤️ during CAIC SOT 2026. No LangChain or high-level frameworks were used in the making of this agent.*

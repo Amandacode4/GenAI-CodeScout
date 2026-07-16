@@ -12,24 +12,37 @@ from tools import web_search, web_fetch, LOCAL_TOOLS
 load_dotenv()
 
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_API_KEY_2 = os.environ.get("GEMINI_API_KEY_2", "")
+GEMINI_API_KEY_3 = os.environ.get("GEMINI_API_KEY_3", "")
+GEMINI_API_KEY_4 = os.environ.get("GEMINI_API_KEY_4", "")
+GEMINI_API_KEY_5 = os.environ.get("GEMINI_API_KEY_5", "")
+GEMINI_API_KEY_6 = os.environ.get("GEMINI_API_KEY_6", "")
 SERPER_API_KEY = os.environ.get("SERPER_API_KEY", "")
 
 PROVIDERS = []
+
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+
+# Add multiple Gemini keys if they exist
+gemini_keys = [
+    GEMINI_API_KEY, GEMINI_API_KEY_2, GEMINI_API_KEY_3, 
+    GEMINI_API_KEY_4, GEMINI_API_KEY_5, GEMINI_API_KEY_6
+]
+
+for idx, key in enumerate(gemini_keys):
+    if key:
+        PROVIDERS.append({
+            "name": f"Gemini (Key {idx+1})",
+            "client": AsyncOpenAI(base_url="https://generativelanguage.googleapis.com/v1beta/openai/", api_key=key),
+            "model": "gemini-2.5-flash"
+        })
 
 if GROQ_API_KEY:
     PROVIDERS.append({
         "name": "Groq",
         "client": AsyncOpenAI(base_url="https://api.groq.com/openai/v1", api_key=GROQ_API_KEY),
         "model": "llama-3.3-70b-versatile"
-    })
-
-if GEMINI_API_KEY:
-    PROVIDERS.append({
-        "name": "Gemini",
-        "client": AsyncOpenAI(base_url="https://generativelanguage.googleapis.com/v1beta/openai/", api_key=GEMINI_API_KEY),
-        "model": "gemini-2.5-flash"
     })
 
 if OPENROUTER_API_KEY:
@@ -44,7 +57,7 @@ MCP_SERVER_URL = "https://api.alphaxiv.org/mcp/v1"
 class ResearchAgent:
     def __init__(self):
         self.messages = [
-            {"role": "system", "content": "You are a helpful research assistant. Use tools to search the web, read pages, and find academic papers to answer the user's questions comprehensively. ALWAYS try to use the tools provided to cite real information. If you get a tool call result, continue iterating until you have a final answer."}
+            {"role": "system", "content": "You are a helpful research assistant. Use tools to search the web, read pages, and find academic papers to answer the user's questions. STRICT RULE: You must use the native JSON tool calling feature. NEVER output raw text like <function\\name{...}<\\function> or XML to call tools."}
         ]
         
     async def get_response(self, user_input: str, status_callback=None, stream_callback=None) -> str:
@@ -130,12 +143,12 @@ class ResearchAgent:
                         
                     except Exception as e:
                         if status_callback:
-                            status_callback(f"{provider['name']} failed during streaming, switching providers...")
+                            status_callback(f"{provider['name']} failed: {str(e)[:100]}...")
                         continue
                         
                 if not response_successful:
                     if status_callback:
-                        status_callback("All APIs are busy or failing. Waiting 10s before retrying...")
+                        status_callback("All servers are heavily loaded. Waiting 10s before retrying...")
                     await asyncio.sleep(10)
             
             # Construct the final message to append to history

@@ -49,7 +49,7 @@ def web_fetch(url: str) -> str:
         if result is None:
             return f"Error: Could not extract text from {url}"
             
-        return result[:8000]  # Truncate to avoid context limit issues
+        return result[:4000]  # Truncate strictly to avoid context limit issues with multiple fetches
     except Exception as e:
         return f"Error fetching url: {e}"
 
