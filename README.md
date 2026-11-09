@@ -1,22 +1,56 @@
-# GenAI Code Scout: Autonomous AI Coding Agent 🚀
+# Code Scout: An Autonomous Coding Agent, Built From Scratch
 
-Welcome to my 5-week engineering journey building **Code Scout**, a fully autonomous AI coding assistant built entirely from scratch during the CAIC Summer of Technology 2026. 
+**Aman Dangar · IIT Delhi · CAIC Summer of Technology 2026, GenAI track**
 
-This repository documents the step-by-step evolution of Code Scout from a simple API script into a powerful, extensible platform capable of reading codebases, executing terminal commands, fixing bugs autonomously, and learning new skills dynamically.
+Code Scout is a terminal coding agent that reads a codebase, runs commands, edits files and checks its
+own work. I built every layer myself over five weeks, starting from a raw LLM API call and without an
+agent framework, to understand where agents actually fail: losing context, acting unsafely, stopping
+before the work is verified, and breaking when an API goes down.
 
----
+## Architecture
 
-## 🌟 What is Code Scout?
-Code Scout is a terminal-based, autonomous coding agent. Instead of just generating text, Code Scout *takes action*. It features:
-- **Interactive REPL & TUI**: Chat with the agent in a standard terminal or a full-screen Textual interface.
-- **Autonomous Execution Loop**: Capable of multi-step reasoning, tool dispatching, and verifying its own work.
-- **Sandboxed Execution**: Executes safe commands immediately but pauses destructive/modifying commands for user approval.
-- **Progressive Disclosure Skills**: Learns complex procedures by loading Markdown-based `SKILL.md` files dynamically.
-- **Model Context Protocol (MCP)**: Connects to external MCP servers (like GitHub) to dynamically expand its toolset.
+```mermaid
+flowchart TB
+    U[User: REPL or Textual TUI] --> A[Agent loop]
+    A <--> M["LLM client<br/>failover across 8 free-tier endpoints"]
+    A --> R[Tool registry]
+    R --> F["Filesystem: read / write / line-edit"]
+    R --> X["run_command<br/>sandbox + approval gate"]
+    R --> W["Web fetch / search<br/>Hugging Face Papers"]
+    R --> C["Code search: grep, definitions"]
+    R --> S["Read-only sub-agents<br/>(separate context)"]
+    R --> MCP["MCP servers over Streamable HTTP<br/>(e.g. GitHub)"]
+    A --> T["TODO list: must verify before stopping"]
+    A --> P["Sessions on disk + AGENTS.md instructions"]
+    K["skills/*/SKILL.md<br/>loaded on demand"] --> A
+```
 
----
+## Design decisions and why
 
-## 🏗️ The 5-Week Evolution (Directory Structure)
+| Problem agents have | What I built |
+|---|---|
+| **They stop before the job is done** | A persistent TODO list the agent must clear, including a verification step (run the tests or re-run the failing command), before it may finish. |
+| **They do dangerous things** | `run_command` runs read-only commands directly but pauses anything destructive or modifying for explicit user approval. |
+| **Context fills up with exploration** | Research goes to **read-only sub-agents** with their own context window; only their summary returns to the main agent. |
+| **Every new procedure needs new code** | A **skills system**: dropping a `SKILL.md` into `skills/` teaches a procedure, loaded only when relevant (progressive disclosure). |
+| **Tools are hard-coded** | **Model Context Protocol** client over Streamable HTTP: external servers' tools merge into the registry at runtime, configured in `config.json`. |
+| **Free-tier APIs rate-limit mid-task** | Automatic failover across **8 free-tier LLM API endpoints** on HTTP 429, without losing the conversation. |
+| **Work is lost between runs** | Sessions saved and resumed from disk; standing instructions in `AGENTS.md`. |
+
+## What I learned
+
+- The hard part of an agent is not calling tools but **deciding when it is done**; explicit verification
+  changed behaviour more than prompt wording.
+- **Context is a budget.** Sub-agents and on-demand skills are both ways of spending it carefully.
+- Safety has to live in the tool layer, not in the prompt.
+
+## Next steps
+
+- An evaluation harness: a fixed set of bug-fix tasks with pass/fail tests, to measure success rate,
+  steps and tokens per task, and compare design choices (with vs without sub-agents, with vs without the
+  verification TODO).
+
+## The 5-Week Evolution (Directory Structure)
 
 This repository is organized by week, demonstrating the architectural evolution of the agent. You can explore each folder to see how the complexity scaled.
 
@@ -40,7 +74,7 @@ The final capstone. Code Scout transformed from a hardcoded script into an exten
 
 ---
 
-## 🚀 Running the Final Version (Week 5)
+## Running the Final Version (Week 5)
 
 Want to try out the final, fully-featured version of Code Scout?
 
