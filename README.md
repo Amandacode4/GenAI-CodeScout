@@ -31,22 +31,22 @@ flowchart TB
 |---|---|
 | **They stop before the job is done** | A persistent TODO list the agent must clear, including a verification step (run the tests or re-run the failing command), before it may finish. |
 | **They do dangerous things** | `run_command` runs read-only commands directly but pauses anything destructive or modifying for explicit user approval. |
-| **Context fills up with exploration** | Research goes to **read-only sub-agents** with their own context window; only their summary returns to the main agent. |
+| **Context fills up with exploration** | Research goes to **read-only sub-agents** with their own context window, and only their summary returns to the main agent. |
 | **Every new procedure needs new code** | A **skills system**: dropping a `SKILL.md` into `skills/` teaches a procedure, loaded only when relevant (progressive disclosure). |
 | **Tools are hard-coded** | **Model Context Protocol** client over Streamable HTTP: external servers' tools merge into the registry at runtime, configured in `config.json`. |
 | **Free-tier APIs rate-limit mid-task** | Automatic failover across **8 free-tier LLM API endpoints** on HTTP 429, without losing the conversation. |
-| **Work is lost between runs** | Sessions saved and resumed from disk; standing instructions in `AGENTS.md`. |
+| **Work is lost between runs** | Sessions saved and resumed from disk, with standing instructions in `AGENTS.md`. |
 
 ## What I learned
 
-- The hard part of an agent is not calling tools but **deciding when it is done**; explicit verification
+- The hard part of an agent is not calling tools but **deciding when it is done**. Explicit verification
   changed behaviour more than prompt wording.
 - **Context is a budget.** Sub-agents and on-demand skills are both ways of spending it carefully.
 - Safety has to live in the tool layer, not in the prompt.
 
 ## Next steps
 
-- An evaluation harness: a fixed set of bug-fix tasks with pass/fail tests, to measure success rate,
+- An evaluation setup: a fixed set of bug-fix tasks with pass/fail tests, to measure success rate,
   steps and tokens per task, and compare design choices (with vs without sub-agents, with vs without the
   verification TODO).
 
